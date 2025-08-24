@@ -3,6 +3,7 @@ This function intends to get exact word onset time of each recording files.
 whisper_approx_char offer faster way but coarse estimation
 
 """
+import re
 from faster_whisper import WhisperModel
 from funasr import AutoModel
 
