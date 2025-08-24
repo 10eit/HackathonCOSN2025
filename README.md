@@ -4,7 +4,21 @@
 参考文献：https://arxiv.org/abs/2507.22229
 `
 ## 👏our pipeline
+```
 
+HackathonCOSN2025/
+├── data  # 变量配置
+├── whisper/
+├── README.md
+├── LICENSE
+├── audio_split.ipynb: split the audio according to the char or word
+├── build_dataset.py: module funtions for building dataset
+├── compare_char_and_words.py: comparison between spliting the autio based on char-level and words-level
+├── encoding_model.py
+├── main_whisper.py: extract audio feature using whisper
+├── split_audio.py: spliting the autio according the result of  **audio_split.ipynb**
+├── transciptor.py: transcipt the caption of audio
+```
 
 
 我们主要是在 ChineseEEG2 数据集（N=8，但是为了方便，我们只使用前四个被试数据）上复现 Uri Hasson 使用 Whisper Model 进行 ECoG 数据的 encoding model 研究代码，我们计划的实现路径（Main Track）是：
