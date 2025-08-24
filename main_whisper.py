@@ -1,3 +1,6 @@
+import glob
+import json
+from tqdm import tqdm
 import whisper
 import numpy as np
 import torch
@@ -66,7 +69,7 @@ def extract_whisper_features(
     audio_tensor = torch.from_numpy(audio).to(device)
 
     # 提取梅尔频谱图（Whisper的核心输入特征）
-    mel = whisper.log_mel_spectrogram(audio_tensor).unsqueeze(0)  # shape: [1, 80, 3000]
+    mel = whisper.log_mel_spectrogram(audio_tensor).unsqueeze(0)  # shape: [1, 80, 3000] 80是梅尔频率带，3000是时间步
     mel_np = mel.squeeze(0).cpu().numpy()  # 去除批次维度并转换为numpy
 
     # 提取模型中间特征（通过修改forward过程获取）
@@ -84,46 +87,47 @@ def extract_whisper_features(
     # 整理特征
     features = {
         # 梅尔频谱图（原始音频特征）
-        "mel_spectrogram": mel_np,
+        # "mel_spectrogram": mel_np,
         # 编码器最后一层输出（高级语义特征）,
         "embedding_unencode": embed_unencoded.squeeze(0).cpu().numpy(),
         "encoder_final_hidden": encoder_output.squeeze(0).cpu().numpy(),
         # 所有编码器层的隐藏状态（用于更灵活的特征选择）
         # "encoder_hidden_states": np.stack([layer.squeeze(0).cpu().numpy() for layer in encoder_hidden_states]),
         # 模型输出的logits（可用于后续语言模型任务）
-        "logits": logits.squeeze(0).cpu().numpy(),
+        # "logits": logits.squeeze(0).cpu().numpy(),
         "decoder_hidden": decoder_hidden.squeeze(0).cpu().numpy()
     }
 
     # 保存特征（如果指定了输出目录）
-    # if output_dir:
-    #     os.makedirs(output_dir, exist_ok = True)
-    #     for name, feat in features.items():
-    #         np.save(os.path.join(output_dir, f"{name}.npy"), feat)
-    #     print(f"特征已保存到: {output_dir}")
+    if output_dir:
+        os.makedirs(os.path.join(output_dir, os.path.basename(audio_path).replace(".wav", "")), exist_ok = True)
+        for name, feat in features.items():
+            np.save(os.path.join(os.path.join(output_dir, os.path.basename(audio_path).replace(".wav", "")), f"{name}.npy"), feat)
+        # print(f"特征已保存到: {output_dir}")
 
     return features
 
 
 if __name__ == "__main__":
+    splitreader = json.load(open("audiodata/transcription_results_m1.json"))
     parser = argparse.ArgumentParser(description = "使用Whisper提取音频特征")
     parser.add_argument("--audio_path", default = "D:/pythonProject/lang_psy/hackathon/audio_0.wav")
-    parser.add_argument("--model", default = "base", help = "Whisper模型名称（tiny, base, small, medium, large）")
+    parser.add_argument("--model", default = "tiny", help = "Whisper模型名称（tiny, base, small, medium, large）")
     parser.add_argument("--output", default = "output")
-
     args = parser.parse_args()
+    for filename in tqdm(glob.glob("audiodata/audio_split/*.wav")):
+        args.audio_path = filename
+        try:
+            features = extract_whisper_features(
+                audio_path = args.audio_path,
+                model_name = args.model,
+                output_dir = args.output
+            )
 
-    try:
-        features = extract_whisper_features(
-            audio_path = args.audio_path,
-            model_name = args.model,
-            output_dir = args.output
-        )
+            # 打印特征信息
+            # print("\n提取的特征信息:")
+            # for name, feat in features.items():
+            #     print(f"- {name}: 形状 {feat.shape}, 数据类型 {feat.dtype}")
 
-        # 打印特征信息
-        print("\n提取的特征信息:")
-        for name, feat in features.items():
-            print(f"- {name}: 形状 {feat.shape}, 数据类型 {feat.dtype}")
-
-    except Exception as e:
-        print(f"提取特征失败: {str(e)}")
+        except Exception as e:
+            print(f"提取特征失败: {str(e)}")
