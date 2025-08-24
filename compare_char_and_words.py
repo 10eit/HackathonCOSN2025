@@ -15,7 +15,7 @@ EEG	        slides (np.ndarray, shape=(n_channels, n_timepoints))
 
 
 # the same as function of encoding_model by Yanlin Fu
-def encoding_model(eeg_data, embedding, split_ratio=0.8):
+def encoding_model(eeg_data, embedding, split_ratio=0.8): # 80% training fold and 20% testing fold
     """
     eeg_data: (n_tokens, n_channels, n_timepoints)
     embedding: (n_tokens, d)
@@ -135,4 +135,5 @@ def plot_word_vs_char(results):
 
 results = run_word_vs_char(char_df, split_ratio=0.8)
 plot_word_vs_char(results)
+
 
