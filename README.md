@@ -4,7 +4,7 @@
 参考文献：https://arxiv.org/abs/2507.22229
 `
 
-我们主要是在 ChineseEEG2 数据集（N=10，但是为了方便，我们只使用前四个被试数据）上复现 Uri Hasson 使用 Whisper Model 进行 ECoG 数据的 encoding model 研究代码，我们计划的实现路径（Main Track）是：
+我们主要是在 ChineseEEG2 数据集（N=8，但是为了方便，我们只使用前四个被试数据）上复现 Uri Hasson 使用 Whisper Model 进行 ECoG 数据的 encoding model 研究代码，我们计划的实现路径（Main Track）是：
 
 1. 对 ChineseEEG2 刺激材料利用 Whisper 进行转写，得到每个 run 开始第一个字的时间，计算平均每个字的时间→约 200 ms，对应 50 个数据点。
   

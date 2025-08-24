@@ -1,6 +1,8 @@
 import os
 import mne
 import pandas as pd
+import numpy as np
+
 def prepare_EEG(run_data, word_onset, duration):
     ## run_data : (n_sensors, n_timepoints)
     first_onset = word_onset[0] / 4 # convert time in seconds 
