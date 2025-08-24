@@ -14,9 +14,11 @@ def whisper_approx_char(audio_path, model_size="tiny", device="cuda"):
     for seg in segments:
         for word in seg.words:
             text = word.word.strip()
-            if not text:
+            # Remove any character that is NOT a Chinese character, letter, or number
+            clean_text = re.sub(r'[^\u4e00-\u9fffa-zA-Z0-9]', '', text)
+            if not clean_text:
                 continue
-            n = len(text)
+            n = len(clean_text)
             duration = word.end - word.start
             step = duration / n
             for i in range(n):
